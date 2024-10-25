@@ -23,6 +23,7 @@ from opencensus.ext.flask.flask_middleware import FlaskMiddleware
  
 # Logging
 logger = logging.getLogger(__name__)# TODO: Setup logger
+logger.setLevel(logging.INFO)
 logger.addHandler(AzureLogHandler(connection_string='InstrumentationKey=bc78d1dd-d45c-4c43-bedc-8b9edf698946;IngestionEndpoint=https://eastasia-0.in.applicationinsights.azure.com/;LiveEndpoint=https://eastasia.livediagnostics.monitor.azure.com/'))
 logger.addHandler(AzureEventHandler(connection_string='InstrumentationKey=bc78d1dd-d45c-4c43-bedc-8b9edf698946;IngestionEndpoint=https://eastasia-0.in.applicationinsights.azure.com/;LiveEndpoint=https://eastasia.livediagnostics.monitor.azure.com/'))
  
@@ -52,25 +53,44 @@ middleware = FlaskMiddleware(
 )
  
 # Load configurations from environment or config file
+# app.config.from_pyfile('config_file.cfg')
+ 
+# if ("VOTE1VALUE" in os.environ and os.environ['VOTE1VALUE']):
+#     button1 = os.environ['VOTE1VALUE']
+# else:
+#     button1 = app.config['VOTE1VALUE']
+ 
+# if ("VOTE2VALUE" in os.environ and os.environ['VOTE2VALUE']):
+#     button2 = os.environ['VOTE2VALUE']
+# else:
+#     button2 = app.config['VOTE2VALUE']
+ 
+# if ("TITLE" in os.environ and os.environ['TITLE']):
+#     title = os.environ['TITLE']
+# else:
+#     title = app.config['TITLE']
+
 app.config.from_pyfile('config_file.cfg')
- 
-if ("VOTE1VALUE" in os.environ and os.environ['VOTE1VALUE']):
-    button1 = os.environ['VOTE1VALUE']
-else:
-    button1 = app.config['VOTE1VALUE']
- 
-if ("VOTE2VALUE" in os.environ and os.environ['VOTE2VALUE']):
-    button2 = os.environ['VOTE2VALUE']
-else:
-    button2 = app.config['VOTE2VALUE']
- 
-if ("TITLE" in os.environ and os.environ['TITLE']):
-    title = os.environ['TITLE']
-else:
-    title = app.config['TITLE']
- 
+button1 = os.getenv('VOTE1VALUE', app.config['VOTE1VALUE'])
+button2 = os.getenv('VOTE2VALUE', app.config['VOTE2VALUE'])
+title = os.getenv('TITLE', app.config['TITLE'])
+
 # Redis Connection
 r = redis.Redis()
+
+# redis_server = os.environ['REDIS']
+
+#    # Redis Connection to another container
+# try:
+#     if "REDIS_PWD" in os.environ:
+#         r = redis.StrictRedis(host=redis_server,
+#                         port=6379,
+#                         password=os.environ['REDIS_PWD'])
+#     else:
+#         r = redis.Redis(redis_server)
+#     r.ping()
+# except redis.ConnectionError:
+#     exit('Failed to connect to Redis, terminating.')
  
 # Change title to host name to demo NLB
 if app.config['SHOWHOST'] == "true":
@@ -84,7 +104,9 @@ if not r.get(button2): r.set(button2,0)
 def index():
  
     if request.method == 'GET':
- 
+
+        tracer.span(name="cat_vote")
+        tracer.span(name="dog_vote")
         # Get current values
         vote1 = r.get(button1).decode('utf-8')
         with tracer.span(name="Cats Vote") as span:
@@ -113,7 +135,10 @@ def index():
             properties = {'custom_dimensions': {'Dogs Vote': vote2}}
             logger.warning("{} voted".format(button2), extra=properties)
             # TODO: use logger object to log dog vote
- 
+            # Log reset events
+            logger.info("Reset Cats Vote", extra={'custom_dimensions': {'Cats Vote': vote1}})
+            logger.info("Reset Dogs Vote", extra={'custom_dimensions': {'Dogs Vote': vote2}})
+
             return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
  
         else:
@@ -125,12 +150,17 @@ def index():
             # Get current values
             vote1 = r.get(button1).decode('utf-8')
             vote2 = r.get(button2).decode('utf-8')
+
+            if vote == button1:
+                logger.info("Cats Vote", extra={'custom_dimensions': {'Cats Vote': vote1}})
+            else:
+                logger.info("Dogs Vote", extra={'custom_dimensions': {'Dogs Vote': vote2}})
  
             # Return results
             return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
  
 if __name__ == "__main__":
     # TODO: Use the statement below when running locally
-    app.run()
+    # app.run()
     # TODO: Use the statement below before deployment to VMSS
-    # app.run(host='0.0.0.0', threaded=True, debug=True) # remote
+    app.run(host='0.0.0.0', threaded=True, debug=True) # remote
