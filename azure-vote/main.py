@@ -32,14 +32,14 @@ config_integration.trace_integrations(["requests"])
 # Logging
 logger = logging.getLogger(__name__)
 handler = AzureLogHandler(
-    connection_string="InstrumentationKey=e73609ab-42bc-4480-a788-7d06c6321055;IngestionEndpoint=https://eastasia-0.in.applicationinsights.azure.com/;LiveEndpoint=https://eastasia.livediagnostics.monitor.azure.com/;ApplicationId=dacda243-b2e1-4ac7-8cc5-6ee205c08cb7"
+    connection_string="InstrumentationKey=885d5304-c58b-4c72-adc3-05b6f2e530a4;IngestionEndpoint=https://southcentralus-3.in.applicationinsights.azure.com/;LiveEndpoint=https://southcentralus.livediagnostics.monitor.azure.com/;ApplicationId=bec6892d-8028-4289-add5-991a31e09660"
 )
 handler.setFormatter(logging.Formatter("%(traceId)s %(spanId)s %(message)s"))
 logger.addHandler(handler)
 # Logging custom Events
 logger.addHandler(
     AzureEventHandler(
-        connection_string="InstrumentationKey=e73609ab-42bc-4480-a788-7d06c6321055;IngestionEndpoint=https://eastasia-0.in.applicationinsights.azure.com/;LiveEndpoint=https://eastasia.livediagnostics.monitor.azure.com/;ApplicationId=dacda243-b2e1-4ac7-8cc5-6ee205c08cb7"
+        connection_string="InstrumentationKey=885d5304-c58b-4c72-adc3-05b6f2e530a4;IngestionEndpoint=https://southcentralus-3.in.applicationinsights.azure.com/;LiveEndpoint=https://southcentralus.livediagnostics.monitor.azure.com/;ApplicationId=bec6892d-8028-4289-add5-991a31e09660"
     )
 )
 # Set the logging level
@@ -48,14 +48,14 @@ logger.setLevel(logging.INFO)
 # Metrics
 exporter = metrics_exporter.new_metrics_exporter(
     enable_standard_metrics=True,
-    connection_string="InstrumentationKey=e73609ab-42bc-4480-a788-7d06c6321055;IngestionEndpoint=https://eastasia-0.in.applicationinsights.azure.com/;LiveEndpoint=https://eastasia.livediagnostics.monitor.azure.com/;ApplicationId=dacda243-b2e1-4ac7-8cc5-6ee205c08cb7",
+    connection_string="InstrumentationKey=885d5304-c58b-4c72-adc3-05b6f2e530a4;IngestionEndpoint=https://southcentralus-3.in.applicationinsights.azure.com/;LiveEndpoint=https://southcentralus.livediagnostics.monitor.azure.com/;ApplicationId=bec6892d-8028-4289-add5-991a31e09660",
 )
 view_manager.register_exporter(exporter)
 
 # Tracing
 tracer = Tracer(
     exporter=AzureExporter(
-        connection_string="InstrumentationKey=e73609ab-42bc-4480-a788-7d06c6321055;IngestionEndpoint=https://eastasia-0.in.applicationinsights.azure.com/;LiveEndpoint=https://eastasia.livediagnostics.monitor.azure.com/;ApplicationId=dacda243-b2e1-4ac7-8cc5-6ee205c08cb7"
+        connection_string="InstrumentationKey=885d5304-c58b-4c72-adc3-05b6f2e530a4;IngestionEndpoint=https://southcentralus-3.in.applicationinsights.azure.com/;LiveEndpoint=https://southcentralus.livediagnostics.monitor.azure.com/;ApplicationId=bec6892d-8028-4289-add5-991a31e09660"
     ),
     sampler=ProbabilitySampler(1.0),
 )
@@ -66,7 +66,7 @@ app = Flask(__name__)
 middleware = FlaskMiddleware(
     app,
     exporter=AzureExporter(
-        connection_string="InstrumentationKey=e73609ab-42bc-4480-a788-7d06c6321055;IngestionEndpoint=https://eastasia-0.in.applicationinsights.azure.com/;LiveEndpoint=https://eastasia.livediagnostics.monitor.azure.com/;ApplicationId=dacda243-b2e1-4ac7-8cc5-6ee205c08cb7"
+        connection_string="InstrumentationKey=885d5304-c58b-4c72-adc3-05b6f2e530a4;IngestionEndpoint=https://southcentralus-3.in.applicationinsights.azure.com/;LiveEndpoint=https://southcentralus.livediagnostics.monitor.azure.com/;ApplicationId=bec6892d-8028-4289-add5-991a31e09660"
     ),
     sampler=ProbabilitySampler(rate=1.0),
 )
@@ -200,4 +200,4 @@ if __name__ == "__main__":
     # app.run()  # local
     # uncomment the line below before deployment to VMSS
     # app.run(host="0.0.0.0", threaded=True, debug=True)  # remote
-    app.run(host='0.0.0.0', threaded=True, debug=True, port=5000) # remote
+    app.run(host='0.0.0.0', threaded=True, debug=True) # remote
