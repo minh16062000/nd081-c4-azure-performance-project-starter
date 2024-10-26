@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # Thêm AzureLogHandler với connection string
-connection_string = 'InstrumentationKey=bc78d1dd-d45c-4c43-bedc-8b9edf698946;IngestionEndpoint=https://eastasia-0.in.applicationinsights.azure.com/;LiveEndpoint=https://eastasia.livediagnostics.monitor.azure.com/;ApplicationId=30425753-d629-4c36-8bfe-55816ecd5ca3'
+connection_string = 'InstrumentationKey=885d5304-c58b-4c72-adc3-05b6f2e530a4;IngestionEndpoint=https://southcentralus-3.in.applicationinsights.azure.com/;LiveEndpoint=https://southcentralus.livediagnostics.monitor.azure.com/;ApplicationId=bec6892d-8028-4289-add5-991a31e09660'
 logger.addHandler(AzureLogHandler(connection_string=connection_string))
 
 # Gửi một số thông điệp log
